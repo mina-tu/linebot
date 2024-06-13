@@ -4,21 +4,12 @@ import flex from '../card/card.js'
 
 export default async event => {
   try {
-    const { data } = await axios.post('https://cloud.culture.tw/frontsite/trans/SearchShowAction.do?method=doFindTypeJ&category=6', new URLSearchParams({
-      title: '',
-      locationName: '',
-      time: '',
-      endTime: '',
-      price: ''
-    }))
-
-    if (process.env.DEBUG === 'true') {
-      console.log('API 回傳資料：', data)
-    }
+    const { data } = await axios.get('https://cloud.culture.tw/frontsite/trans/SearchShowAction.do?method=doFindTypeJ&category=6')
 
     const replies = data
+      .filter(d => d.showInfo[0].latitude && d.showInfo[0].longitude)
       .map(d => {
-        d.distance = distance(d.latitude, d.longitude, event.message.latitude, event.message.longitude, 'k')
+        d.distance = distance(d.showInfo[0].latitude, d.showInfo[0].longitude, event.message.latitude, event.message.longitude, 'k')
         return d
       })
       .sort((a, b) => a.distance - b.distance)
